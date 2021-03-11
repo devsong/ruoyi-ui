@@ -346,8 +346,8 @@ export default {
     handleCellDbClick(row, column, cell, event) {
       // 5 9 10列的数据较长,需要弹出对话框显示
       const index = column.index;
-      if (index === 5 || index === 9 || index === 10) {
-        JSON.stringify(cell);
+      if (index === 5 || index === 9 || index === 10 || index === 12) {
+        // JSON.stringify(cell);
         this.open = true;
         this.detailMsg = cell.innerText;
       }
