@@ -88,7 +88,7 @@ export function getSnowflake(key) {
 export function base62encode(id) {
   return request({
     url: '/api/serial/base62/encode',
-    method: 'post',
+    method: 'get',
     params: {
       id: id
     }
@@ -107,8 +107,8 @@ export function base62decode(id) {
 
 export function base32decode(id) {
   return request({
-    url: '/api/serial/base32/encode',
-    method: 'post',
+    url: "/api/serial/base32/encode",
+    method: "get",
     params: {
       id: id
     }
