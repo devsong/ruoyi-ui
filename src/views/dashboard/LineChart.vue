@@ -20,7 +20,7 @@ export default {
     },
     height: {
       type: String,
-      default: '350px'
+      default: '400px'
     },
     autoResize: {
       type: Boolean,
@@ -93,7 +93,8 @@ export default {
           data: ['expected', 'actual']
         },
         series: [{
-          name: 'expected', itemStyle: {
+          name: 'expected', 
+          itemStyle: {
             normal: {
               color: '#FF005A',
               lineStyle: {

@@ -75,15 +75,42 @@
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
-    
+
+    <div class="dashboard-editor-container">
+        <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
+            <perf-line :chartData="lineData"/>
+        </el-row>
+    </div>
   </div>
 </template>
 
 <script>
-import {getMetaLog ,getMetaLogCount} from '@/api/monitor/perflog';
-
+import { getMetaLog, getMetaLogCount } from '@/api/monitor/perflog';
+import PerfLine from './perf_line.vue';
+const ds ={
+  title:'性能图表',
+  dataset:{
+    source: [
+        ['date', 'elapsed',],
+        ['2020-01-02 11:01', 58212],
+        ['2020-01-02 11:02', 78254],
+        ['2020-01-02 11:03', 41032],
+        ['2020-01-02 11:04', 12755],
+        ['2020-01-02 11:05', 20145],
+        ['2020-01-02 11:06', 79146],
+        ['2020-01-02 11:07', 91852],
+        ['2020-01-02 11:08', 101852],
+        ['2020-01-02 11:09', 20112]
+      ]
+    },
+    x:'date',
+    y:'elapsed'
+  };
 export default {
   name: 'SysperfLogCount',
+  components: {
+    PerfLine
+  },
   data() {
     return {
       // 遮罩层
@@ -116,7 +143,8 @@ export default {
         method: undefined,
         operatorIps: undefined,
         level: undefined
-      }
+      },
+      lineData: ds
     };
   },
   created() {
@@ -131,7 +159,7 @@ export default {
         this.loading = false;
       });
     },
-    
+
     // 表单重置
     reset() {
       this.form = {
@@ -244,3 +272,24 @@ export default {
   }
 };
 </script>
+
+
+<style lang="scss" scoped>
+.dashboard-editor-container {
+  padding: 32px;
+  background-color: rgb(240, 242, 245);
+  position: relative;
+
+  .chart-wrapper {
+    background: #fff;
+    padding: 16px 16px 0;
+    margin-bottom: 32px;
+  }
+}
+
+@media (max-width:1024px) {
+  .chart-wrapper {
+    padding: 8px;
+  }
+}
+</style>
