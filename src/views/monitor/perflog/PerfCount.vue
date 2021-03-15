@@ -145,39 +145,46 @@ export default {
         level: undefined
       },
       executeData: {
-        title:'',
-        xAxis:[],
-        yAxis:[]
+        title: '',
+        xAxis: [],
+        yAxis: [],
+        yUnit: ''
       },
       expRatioData: {
-        title:'',
-        xAxis:[],
-        yAxis:[]
+        title: '',
+        xAxis: [],
+        yAxis: [],
+        yUnit: ''
       },
       sysExpRatioData: {
-        title:'',
-        xAxis:[],
-        yAxis:[]
+        title: '',
+        xAxis: [],
+        yAxis: [],
+        yUnit: ''
       },
       bizExpRatioData: {
-        title:'',
-        xAxis:[],
-        yAxis:[]
+        title: '',
+        xAxis: [],
+        yAxis: [],
+        yUnit: ''
       },
       avgTimeData: {
-        title:'',
-        xAxis:[],
-        yAxis:[]
+        title: '',
+        xAxis: [],
+        yAxis: [],
+        yUnit: ''
       },
       maxTimeData: {
-        title:'',
-        xAxis:[],
-        yAxis:[]
+        title: '',
+        xAxis: [],
+        yAxis: [],
+        yUnit: ''
       },
       minTimeData: {
-        title:'',
-        xAxis:[],
-        yAxis:[]
+        title: '',
+        xAxis: [],
+        yAxis: [],
+        yUnit: ''
       }
     };
   },
@@ -191,39 +198,76 @@ export default {
       this.loading = true;
       getMetaLogCount(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
         this.loading = false;
+        // 标题
         for (let item in response.rows) {
           var row = response.rows[item];
-          this.executeData.title = "执行次数";
+          var prefix = this.buildPrefixTitle(row);
+          this.executeData.title = prefix + "执行次数";
+          this.executeData.yUnit = '';
+          this.expRatioData.title = prefix + "异常率";
+          this.expRatioData.yUnit = '';
+          this.sysExpRatioData.title = prefix + "系统异常率";
+          this.executeData.yUnit = '';
+          this.bizExpRatioData.title = prefix + "业务异常率";
+          this.bizExpRatioData.yUnit = '';
+          this.avgTimeData.title = prefix + "平均执行时间";
+          this.avgTimeData.yUnit = 'ms';
+          this.maxTimeData.title = prefix + "最大执行时间";
+          this.maxTimeData.yUnit = 'ms';
+          this.minTimeData.title = prefix + "最小执行时间";
+          this.minTimeData.yUnit = 'ms';
+          break;
+        }
+        // x,y轴坐标数据实体
+        for (let item in response.rows) {
+          var row = response.rows[item];
+
           this.executeData.xAxis.push(row.countDuration);
           this.executeData.yAxis.push(row.executeTotal);
 
-          this.expRatioData.title = "异常率";
           this.expRatioData.xAxis.push(row.countDuration);
           this.expRatioData.yAxis.push(row.exceptionRatio);
 
-          this.sysExpRatioData.title = "系统异常率";
           this.sysExpRatioData.xAxis.push(row.countDuration);
           this.sysExpRatioData.yAxis.push(row.sysExceptionRatio);
 
-          this.bizExpRatioData.title = "业务异常率";
           this.bizExpRatioData.xAxis.push(row.countDuration);
           this.bizExpRatioData.yAxis.push(row.bizExceptionRatio);
 
-          this.avgTimeData.title = "平均执行时间";
           this.avgTimeData.xAxis.push(row.countDuration);
           this.avgTimeData.yAxis.push(row.executeTimeAvg);
 
-          this.maxTimeData.title = "最大执行时间";
           this.maxTimeData.xAxis.push(row.countDuration);
           this.maxTimeData.yAxis.push(row.executeTimeMax);
 
-          this.minTimeData.title = "最小执行时间";
           this.minTimeData.xAxis.push(row.countDuration);
           this.minTimeData.yAxis.push(row.executeTimeMin);
         }
       });
     },
-
+    buildPrefixTitle(row) {
+      var prefix = '';
+      if (row.product && row.product != '') {
+        prefix += row.product + '_';
+      }
+      if (row.groupName && row.groupName != '') {
+        prefix += row.groupName + '_';
+      }
+      if (row.app && row.app != '') {
+        prefix += row.app + '_';
+      }
+      if (row.clazz && row.clazz != '') {
+        prefix += row.clazz + '_';
+      }
+      if (row.method && row.method != '') {
+        prefix += row.method + '_';
+      }
+      if (row.operatorIp && row.operatorIp != '') {
+        prefix += row.operatorIp + '_';
+      }
+      return prefix;
+    },
+    
     // 表单重置
     reset() {
       this.form = {
