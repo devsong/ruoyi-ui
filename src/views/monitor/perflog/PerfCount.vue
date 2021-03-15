@@ -77,35 +77,35 @@
     </el-form>
 
     <div class="dashboard-editor-container">
-        <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
-            <perf-line :chartData="lineData"/>
-        </el-row>
+      <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
+        <perf-line :chartData="executeData" />
+      </el-row>
+      <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
+        <perf-line :chartData="expRatioData" />
+      </el-row>
+      <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
+        <perf-line :chartData="sysExpRatioData" />
+      </el-row>
+      <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
+        <perf-line :chartData="bizExpRatioData" />
+      </el-row>
+      <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
+        <perf-line :chartData="avgTimeData" />
+      </el-row>
+      <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
+        <perf-line :chartData="maxTimeData" />
+      </el-row>
+      <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
+        <perf-line :chartData="minTimeData" />
+      </el-row>
     </div>
   </div>
 </template>
 
 <script>
 import { getMetaLog, getMetaLogCount } from '@/api/monitor/perflog';
-import PerfLine from './perf_line.vue';
-const ds ={
-  title:'性能图表',
-  dataset:{
-    source: [
-        ['date', 'elapsed',],
-        ['2020-01-02 11:01', 58212],
-        ['2020-01-02 11:02', 78254],
-        ['2020-01-02 11:03', 41032],
-        ['2020-01-02 11:04', 12755],
-        ['2020-01-02 11:05', 20145],
-        ['2020-01-02 11:06', 79146],
-        ['2020-01-02 11:07', 91852],
-        ['2020-01-02 11:08', 101852],
-        ['2020-01-02 11:09', 20112]
-      ]
-    },
-    x:'date',
-    y:'elapsed'
-  };
+import PerfLine from './PerfLine.vue';
+
 export default {
   name: 'SysperfLogCount',
   components: {
@@ -144,7 +144,41 @@ export default {
         operatorIps: undefined,
         level: undefined
       },
-      lineData: ds
+      executeData: {
+        title:'',
+        xAxis:[],
+        yAxis:[]
+      },
+      expRatioData: {
+        title:'',
+        xAxis:[],
+        yAxis:[]
+      },
+      sysExpRatioData: {
+        title:'',
+        xAxis:[],
+        yAxis:[]
+      },
+      bizExpRatioData: {
+        title:'',
+        xAxis:[],
+        yAxis:[]
+      },
+      avgTimeData: {
+        title:'',
+        xAxis:[],
+        yAxis:[]
+      },
+      maxTimeData: {
+        title:'',
+        xAxis:[],
+        yAxis:[]
+      },
+      minTimeData: {
+        title:'',
+        xAxis:[],
+        yAxis:[]
+      }
     };
   },
   created() {
@@ -157,6 +191,36 @@ export default {
       this.loading = true;
       getMetaLogCount(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
         this.loading = false;
+        for (let item in response.rows) {
+          var row = response.rows[item];
+          this.executeData.title = "执行次数";
+          this.executeData.xAxis.push(row.countDuration);
+          this.executeData.yAxis.push(row.executeTotal);
+
+          this.expRatioData.title = "异常率";
+          this.expRatioData.xAxis.push(row.countDuration);
+          this.expRatioData.yAxis.push(row.exceptionRatio);
+
+          this.sysExpRatioData.title = "系统异常率";
+          this.sysExpRatioData.xAxis.push(row.countDuration);
+          this.sysExpRatioData.yAxis.push(row.sysExceptionRatio);
+
+          this.bizExpRatioData.title = "业务异常率";
+          this.bizExpRatioData.xAxis.push(row.countDuration);
+          this.bizExpRatioData.yAxis.push(row.bizExceptionRatio);
+
+          this.avgTimeData.title = "平均执行时间";
+          this.avgTimeData.xAxis.push(row.countDuration);
+          this.avgTimeData.yAxis.push(row.executeTimeAvg);
+
+          this.maxTimeData.title = "最大执行时间";
+          this.maxTimeData.xAxis.push(row.countDuration);
+          this.maxTimeData.yAxis.push(row.executeTimeMax);
+
+          this.minTimeData.title = "最小执行时间";
+          this.minTimeData.xAxis.push(row.countDuration);
+          this.minTimeData.yAxis.push(row.executeTimeMin);
+        }
       });
     },
 
@@ -267,8 +331,6 @@ export default {
       });
     },
 
-
-
   }
 };
 </script>
@@ -287,7 +349,7 @@ export default {
   }
 }
 
-@media (max-width:1024px) {
+@media (max-width: 1024px) {
   .chart-wrapper {
     padding: 8px;
   }

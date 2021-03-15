@@ -41,7 +41,7 @@ module.exports = {
         }
       }
     },
-    // public: "0.0.0.0",
+    public: "0.0.0.0:1024",
     disableHostCheck: true,
     headers: {
       "Access-Control-Allow-Origin": "*",

@@ -52,7 +52,7 @@
       </el-form-item>
 
       <el-form-item label="服务IP" prop="operatorIps">
-        <el-select filterable v-model="queryParams.operatorIps" multiple="true" placeholder="请选择" >
+        <el-select filterable v-model="queryParams.operatorIps" placeholder="请选择" multiple>
           <el-option v-for="item in option.operatorIps" :key="item" :label="item" :value="item" />
         </el-select>
       </el-form-item>
