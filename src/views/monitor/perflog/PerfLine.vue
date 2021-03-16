@@ -70,6 +70,9 @@ export default {
             return [pt[0], '100%'];
           }
         },
+        grid:{
+            
+        },
         title: {
           text: title,
           left: 'center',

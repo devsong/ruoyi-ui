@@ -155,7 +155,7 @@
 </style>
 
 <script>
-import { listLog,  getMetaLog } from '@/api/monitor/perflog';
+import { listLog, getMetaLog } from '@/api/monitor/perflog';
 
 export default {
   name: 'Sysperflog',
@@ -204,7 +204,7 @@ export default {
         app: undefined,
         clazz: undefined,
         method: undefined,
-        operatorIps:undefined,
+        operatorIps: undefined,
         level: undefined
       },
       // 表单参数
@@ -215,6 +215,25 @@ export default {
       rules: {
       }
     };
+  },
+  computed: {
+    timeDefault() {
+      let date = new Date();
+      // 通过时间戳计算
+      let defalutStartTime = date.getTime() - 1 * 24 * 3600 * 1000;// 转化为时间戳
+      let defalutEndTime = date.getTime();
+      let startDateNs = new Date(defalutStartTime);
+      let endDateNs = new Date(defalutEndTime);
+      // 月，日 不够10补0
+      defalutStartTime = startDateNs.getFullYear() + '-' + ((startDateNs.getMonth() + 1) >= 10 ? (startDateNs.getMonth() + 1) : '0' + (startDateNs.getMonth() + 1)) + '-' + (startDateNs.getDate() >= 10 ? startDateNs.getDate() : '0' + startDateNs.getDate()) + " 00:00:00";
+      defalutEndTime = endDateNs.getFullYear() + '-' + ((endDateNs.getMonth() + 1) >= 10 ? (endDateNs.getMonth() + 1) : '0' + (endDateNs.getMonth() + 1)) + '-' + (endDateNs.getDate() >= 10 ? endDateNs.getDate() : '0' + endDateNs.getDate()) + " 00:00:00";
+      return [defalutStartTime, defalutEndTime];
+    }
+  },
+  //页面加载时候，在mounted中进行赋值
+  mounted() {
+    // 初始化查询，默认为前一天
+    this.dateRange = this.timeDefault;
   },
   created() {
     this.getProducts();
@@ -260,7 +279,7 @@ export default {
       this.resetForm('queryForm');
       this.handleQuery();
     },
-  
+
     //
     tableCellClassName({ row, column, rowIndex, columnIndex }) {
       row.index = rowIndex;

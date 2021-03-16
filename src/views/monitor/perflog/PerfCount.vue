@@ -62,7 +62,7 @@
           v-model="dateRange"
           size="small"
           style="width: 320px"
-          value-format="yyyy-MM-dd"
+          value-format="yyyy-MM-dd HH:mm:ss"
           type="daterange"
           range-separator="-"
           start-placeholder="开始日期"
@@ -105,6 +105,15 @@
 <script>
 import { getMetaLog, getMetaLogCount } from '@/api/monitor/perflog';
 import PerfLine from './PerfLine.vue';
+// 折线图数据模型
+class LineData {
+  constructor() {
+    this.title = '';
+    this.xAxis = [];
+    this.yAxis = [];
+    this.yUnit = '';
+  }
+}
 
 export default {
   name: 'SysperfLogCount',
@@ -135,7 +144,7 @@ export default {
       // 查询参数
       queryParams: {
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 5000,
         product: undefined,
         group: undefined,
         app: undefined,
@@ -144,49 +153,33 @@ export default {
         operatorIps: undefined,
         level: undefined
       },
-      executeData: {
-        title: '',
-        xAxis: [],
-        yAxis: [],
-        yUnit: ''
-      },
-      expRatioData: {
-        title: '',
-        xAxis: [],
-        yAxis: [],
-        yUnit: ''
-      },
-      sysExpRatioData: {
-        title: '',
-        xAxis: [],
-        yAxis: [],
-        yUnit: ''
-      },
-      bizExpRatioData: {
-        title: '',
-        xAxis: [],
-        yAxis: [],
-        yUnit: ''
-      },
-      avgTimeData: {
-        title: '',
-        xAxis: [],
-        yAxis: [],
-        yUnit: ''
-      },
-      maxTimeData: {
-        title: '',
-        xAxis: [],
-        yAxis: [],
-        yUnit: ''
-      },
-      minTimeData: {
-        title: '',
-        xAxis: [],
-        yAxis: [],
-        yUnit: ''
-      }
+      executeData: new LineData(),
+      expRatioData: new LineData(),
+      sysExpRatioData: new LineData(),
+      bizExpRatioData: new LineData(),
+      avgTimeData: new LineData(),
+      maxTimeData: new LineData(),
+      minTimeData: new LineData()
     };
+  },
+  computed: {
+    timeDefault() {
+      let date = new Date();
+      // 通过时间戳计算
+      let defalutStartTime = date.getTime() - 1 * 24 * 3600 * 1000;// 转化为时间戳
+      let defalutEndTime = date.getTime();
+      let startDateNs = new Date(defalutStartTime);
+      let endDateNs = new Date(defalutEndTime);
+      // 月，日 不够10补0
+      defalutStartTime = startDateNs.getFullYear() + '-' + ((startDateNs.getMonth() + 1) >= 10 ? (startDateNs.getMonth() + 1) : '0' + (startDateNs.getMonth() + 1)) + '-' + (startDateNs.getDate() >= 10 ? startDateNs.getDate() : '0' + startDateNs.getDate()) + " 00:00:00";
+      defalutEndTime = endDateNs.getFullYear() + '-' + ((endDateNs.getMonth() + 1) >= 10 ? (endDateNs.getMonth() + 1) : '0' + (endDateNs.getMonth() + 1)) + '-' + (endDateNs.getDate() >= 10 ? endDateNs.getDate() : '0' + endDateNs.getDate()) + " 00:00:00";
+      return [defalutStartTime, defalutEndTime];
+    }
+  },
+  //页面加载时候，在mounted中进行赋值
+  mounted() {
+    // 初始化查询，默认为前一天
+    this.dateRange = this.timeDefault;
   },
   created() {
     this.getProducts();
@@ -196,12 +189,13 @@ export default {
     /** 查询系统接口日志列表 */
     getList() {
       this.loading = true;
+      this.resetGraph();
       getMetaLogCount(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
         this.loading = false;
         // 标题
         for (let item in response.rows) {
-          var row = response.rows[item];
-          var prefix = this.buildPrefixTitle(row);
+          let row = response.rows[item];
+          let prefix = this.buildPrefixTitle(row);
           this.executeData.title = prefix + "执行次数";
           this.executeData.yUnit = '';
           this.expRatioData.title = prefix + "异常率";
@@ -220,7 +214,7 @@ export default {
         }
         // x,y轴坐标数据实体
         for (let item in response.rows) {
-          var row = response.rows[item];
+          let row = response.rows[item];
 
           this.executeData.xAxis.push(row.countDuration);
           this.executeData.yAxis.push(row.executeTotal);
@@ -246,7 +240,7 @@ export default {
       });
     },
     buildPrefixTitle(row) {
-      var prefix = '';
+      let prefix = '';
       if (row.product && row.product != '') {
         prefix += row.product + '_';
       }
@@ -267,11 +261,19 @@ export default {
       }
       return prefix;
     },
-    
+    resetGraph() {
+      let graphs = [this.executeData, this.expRatioData, this.sysExpRatioData, this.bizExpRatioData, this.avgTimeData, this.maxTimeData, this.minTimeData];
+      for (let item in graphs) {
+        let graph = graphs[item];
+        graph.title = '';
+        graph.xAxis = [];
+        graph.yAxis = [];
+        graph.yUnit = '';
+      }
+    },
     // 表单重置
     reset() {
       this.form = {
-        id: undefined,
         metaId: undefined,
         executeTimespan: undefined,
         paramsIn: undefined,
