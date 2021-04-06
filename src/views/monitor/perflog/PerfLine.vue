@@ -62,16 +62,18 @@ export default {
       this.chart = echarts.init(this.$el, 'macarons');
       this.setOptions(this.chartData);
     },
-    setOptions({ title, xAxis, yAxis, yUnit } = {}) {
+    setOptions({ title, xAxis, yAxis, yUnit, yFormat } = {}) {
       this.chart.setOption({
         tooltip: {
           trigger: 'axis',
           position: function (pt) {
             return [pt[0], '100%'];
-          }
+          },
+          formatter: '{b0}<br/>{a0}: {c0}'+yUnit
+          // formatter: '{b0}: {c0}<br />{b1}: {c1}'
         },
-        grid:{
-            
+        grid: {
+
         },
         title: {
           text: title,
@@ -95,6 +97,11 @@ export default {
           type: 'value',
           name: yUnit,
           boundaryGap: [0, '10%'],
+          axisLabel: {
+            show: true,
+            interval: 'auto'
+          },
+          show: true
         },
         // dataZoom: [{
         //   type: 'inside',
@@ -115,7 +122,7 @@ export default {
         // }],
         series: [
           {
-            name: title + yUnit,
+            name: title,
             type: 'line',
             smooth: true,
             symbol: 'none',

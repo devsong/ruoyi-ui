@@ -112,6 +112,7 @@ class LineData {
     this.xAxis = [];
     this.yAxis = [];
     this.yUnit = '';
+    this.yFormat = '{value}';
   }
 }
 
@@ -198,16 +199,25 @@ export default {
           let prefix = this.buildPrefixTitle(row);
           this.executeData.title = prefix + "执行次数";
           this.executeData.yUnit = '';
+          
           this.expRatioData.title = prefix + "异常率";
-          this.expRatioData.yUnit = '';
+          this.expRatioData.yUnit = '%';
+          this.expRatioData.yFormat='{value}%'
+          
           this.sysExpRatioData.title = prefix + "系统异常率";
-          this.executeData.yUnit = '';
+          this.sysExpRatioData.yUnit = '%';
+          this.sysExpRatioData.yFormat='{value}'
+          
           this.bizExpRatioData.title = prefix + "业务异常率";
-          this.bizExpRatioData.yUnit = '';
+          this.bizExpRatioData.yUnit = '%';
+          this.bizExpRatioData.yFormat='{value}'
+          
           this.avgTimeData.title = prefix + "平均执行时间";
           this.avgTimeData.yUnit = 'ms';
+          
           this.maxTimeData.title = prefix + "最大执行时间";
           this.maxTimeData.yUnit = 'ms';
+          
           this.minTimeData.title = prefix + "最小执行时间";
           this.minTimeData.yUnit = 'ms';
           break;
@@ -220,13 +230,13 @@ export default {
           this.executeData.yAxis.push(row.executeTotal);
 
           this.expRatioData.xAxis.push(row.countDuration);
-          this.expRatioData.yAxis.push(row.exceptionRatio);
+          this.expRatioData.yAxis.push((row.exceptionRatio*100).toFixed(2));
 
           this.sysExpRatioData.xAxis.push(row.countDuration);
-          this.sysExpRatioData.yAxis.push(row.sysExceptionRatio);
+          this.sysExpRatioData.yAxis.push((row.sysExceptionRatio*100).toFixed(2));
 
           this.bizExpRatioData.xAxis.push(row.countDuration);
-          this.bizExpRatioData.yAxis.push(row.bizExceptionRatio);
+          this.bizExpRatioData.yAxis.push((row.bizExceptionRatio*100).toFixed(2));
 
           this.avgTimeData.xAxis.push(row.countDuration);
           this.avgTimeData.yAxis.push(row.executeTimeAvg);
