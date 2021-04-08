@@ -236,6 +236,7 @@ export default {
     this.dateRange = this.timeDefault;
   },
   created() {
+    this.dateRange = this.timeDefault;
     this.getProducts();
     this.getList();
   },

@@ -69,8 +69,8 @@ export default {
           position: function (pt) {
             return [pt[0], '100%'];
           },
-          formatter: '{b0}<br/>{a0}: {c0}'+yUnit
-          // formatter: '{b0}: {c0}<br />{b1}: {c1}'
+          formatter: '{b0}<br/>{c0}'+yUnit,
+          // formatter: '{b0}<br/>{a0}: {c0}'+yUnit
         },
         grid: {
 
