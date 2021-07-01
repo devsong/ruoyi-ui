@@ -12,6 +12,7 @@ node_modules
 .mtj.tmp/
 
 # Package Files #
+dist
 *.jar
 *.war
 *.nar
