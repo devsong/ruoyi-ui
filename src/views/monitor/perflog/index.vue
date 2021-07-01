@@ -83,6 +83,13 @@
 
     <PerfSearch />
 
+    <el-form :model="queryParams">
+      <el-form-item>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+      </el-form-item>
+    </el-form>
+
     <el-table
       v-loading="loading"
       class="cell-limit"
@@ -154,9 +161,12 @@
 
 <script>
 import { listLog, getMetaLog } from '@/api/monitor/perflog';
-import { PerfSearch } from './PerfSearch.vue'
+import PerfSearch from './PerfSearch.vue'
 export default {
   name: 'Sysperflog',
+  components:{
+    PerfSearch 
+  },
   data() {
     return {
       // 遮罩层
