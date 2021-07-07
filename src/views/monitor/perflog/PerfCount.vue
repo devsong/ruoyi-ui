@@ -99,7 +99,7 @@ export default {
           
           this.expRatioData.title = prefix + "异常率";
           this.expRatioData.yUnit = '%';
-          this.expRatioData.yFormat='{value}%'
+          this.expRatioData.yFormat='{value}'
           
           this.sysExpRatioData.title = prefix + "系统异常率";
           this.sysExpRatioData.yUnit = '%';
