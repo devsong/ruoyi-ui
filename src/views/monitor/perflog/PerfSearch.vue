@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container">
+  <div>
     <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="68px">
       <el-form-item label="产品线" prop="product">
         <el-select
@@ -41,11 +41,7 @@
       </el-form-item>
 
       <el-form-item label="方法名" prop="method">
-        <el-select
-          filterable
-          v-model="queryParams.method"
-          placeholder="请选择"
-        >
+        <el-select filterable v-model="queryParams.method" placeholder="请选择">
           <el-option v-for="item in option.methods" :key="item" :label="item" :value="item" />
         </el-select>
       </el-form-item>
@@ -62,15 +58,6 @@
           end-placeholder="结束日期"
         />
       </el-form-item>
-
-      <el-form-item label="日志ID" prop="id">
-        <el-input
-          v-model="queryParams.id"
-          placeholder="请输入日志ID"
-          clearable
-          size="small"
-        />
-      </el-form-item>
     </el-form>
   </div>
 </template>
@@ -84,8 +71,6 @@ export default {
     return {
       // 弹出层标题
       title: '',
-      // 是否显示弹出层
-      open: false,
       // 下拉列表数据
       option: {
         // 产品线
@@ -103,22 +88,12 @@ export default {
       dateRange: [],
       // 查询参数
       queryParams: {
-        pageNum: 1,
-        pageSize: 10,
-        id: undefined,
         product: undefined,
         group: undefined,
         app: undefined,
         clazz: undefined,
         method: undefined,
         level: undefined
-      },
-      // 表单参数
-      form: {},
-      // 明细日志
-      detailMsg: '',
-      // 表单校验
-      rules: {
       }
     };
   },
@@ -147,19 +122,19 @@ export default {
   },
   methods: {
     // 表单重置
-    reset() {
-      this.form = {
-        id: undefined,
-        metaId: undefined,
-        executeTimespan: undefined,
-        paramsIn: undefined,
-        paramsOut: undefined,
-        code: undefined,
-        errmsg: undefined,
-        createTime: undefined,
-        timestamp: undefined
-      };
-      this.resetForm('form');
+    resetQueryForm() {
+      // this.option.products = [],
+      // this.option.groups = [],
+      // this.option.apps = [],
+      // this.option.clazzs = [],
+      // this.option.methods = [],
+      this.queryParams.product = undefined;
+      this.queryParams.group = undefined;
+      this.queryParams.app = undefined;
+      this.queryParams.clazz = undefined;
+      this.queryParams.method = undefined;
+      this.dateRange = this.timeDefault;
+      this.getProducts();
     },
 
     // 获取产品线

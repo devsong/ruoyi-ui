@@ -1,92 +1,27 @@
 <template>
   <div class="app-container">
-    <!--
-    <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="68px">
-      <el-form-item label="产品线" prop="product">
-        <el-select
-          filterable
-          v-model="queryParams.product"
-          placeholder="请选择"
-          @change="handleProductChange"
-        >
-          <el-option v-for="item in option.products" :key="item" :label="item" :value="item" />
-        </el-select>
-      </el-form-item>
+    <perf-search ref="searchForm"/>
 
-      <el-form-item label="分组" prop="group">
-        <el-select
-          filterable
-          v-model="queryParams.group"
-          placeholder="请选择"
-          @change="handleGroupChange"
-        >
-          <el-option v-for="item in option.groups" :key="item" :label="item" :value="item" />
-        </el-select>
-      </el-form-item>
-
-      <el-form-item label="应用" prop="app">
-        <el-select filterable v-model="queryParams.app" placeholder="请选择" @change="handleAppChange">
-          <el-option v-for="item in option.apps" :key="item" :label="item" :value="item" />
-        </el-select>
-      </el-form-item>
-
-      <el-form-item label="类名" prop="clazz">
-        <el-select
-          filterable
-          v-model="queryParams.clazz"
-          placeholder="请选择"
-          @change="handleClazzChange"
-        >
-          <el-option v-for="item in option.clazzs" :key="item" :label="item" :value="item" />
-        </el-select>
-      </el-form-item>
-
-      <el-form-item label="方法名" prop="method">
-        <el-select
-          filterable
-          v-model="queryParams.method"
-          placeholder="请选择"
-        >
-          <el-option v-for="item in option.methods" :key="item" :label="item" :value="item" />
-        </el-select>
-      </el-form-item>
-
-      <el-form-item label="时间" prop="createTime">
-        <el-date-picker
-          v-model="dateRange"
-          size="small"
-          style="width: 320px"
-          value-format="yyyy-MM-dd HH:mm:ss"
-          type="daterange"
-          range-separator="-"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-        />
-      </el-form-item>
-
+    <el-form ref="formParams" :model="formParams" :inline="true" label-width="68px">
       <el-form-item label="日志ID" prop="id">
         <el-input
-          v-model="queryParams.id"
+          v-model="formParams.id"
           placeholder="请输入日志ID"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-
-      <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
-      </el-form-item>
     </el-form>
-    -->
 
-    <PerfSearch ref="searchForm"/>
-
-    <div>
+    <el-row class="btn-group">
+      <el-col :span="2">
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+      </el-col>
+      <el-col :span="2">
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
-    </div>
+      </el-col>
+    </el-row>
 
     <el-table
       v-loading="loading"
@@ -133,8 +68,8 @@
     <pagination
       v-show="total>0"
       :total="total"
-      :page.sync="pageParams.pageNum"
-      :limit.sync="pageParams.pageSize"
+      :page.sync="formParams.pageNum"
+      :limit.sync="formParams.pageSize"
       @pagination="getList"
     />
 
@@ -155,6 +90,10 @@
   -webkit-line-clamp: 2; /*可以显示的行数，超出部分用...表示 */
   -webkit-box-orient: vertical;
 }
+
+.btn-group{
+  padding:0 0 10px 0px;
+}
 </style>
 
 <script>
@@ -168,7 +107,7 @@ export default {
   data() {
     return {
       // 遮罩层
-      loading: true,
+      loading: false,
       // 选中数组
       ids: [],
       // 非单个禁用
@@ -183,26 +122,12 @@ export default {
       title: '',
       // 是否显示弹出层
       open: false,
-      // 下拉列表数据
-      option: {
-        // 产品线
-        products: [],
-        // 分组
-        groups: [],
-        // 应用
-        apps: [],
-        // 类名
-        clazzs: [],
-        // 方法名
-        methods: []
-        // 服务器IP
-        // operatorIps: []
-      },
       // 表单参数
       form: {
 
       },
-      pageParams: {
+      formParams: {
+        id:undefined,
         pageNum: 1,
         pageSize: 10
       },
@@ -215,16 +140,14 @@ export default {
     };
   },
   computed: {
-   
   },
   created() {
-    this.getList();
   },
   methods: {
     /** 查询系统接口日志列表 */
     getList() {
       this.loading = true;
-      let mergeParams = Object.assign(this.pageParams,this.$refs.searchForm.queryParams);
+      let mergeParams = Object.assign(this.formParams,this.$refs.searchForm.queryParams);
       listLog(this.addDateRange(mergeParams, this.$refs.searchForm.dateRange)).then(response => {
         this.logList = response.rows;
         this.total = response.total;
@@ -236,31 +159,15 @@ export default {
       this.open = false;
       this.detailMsg = '';
     },
-    // 表单重置
-    reset() {
-      this.form = {
-        id: undefined,
-        metaId: undefined,
-        operatorIp:undefined,
-        executeTimespan: undefined,
-        paramsIn: undefined,
-        paramsOut: undefined,
-        code: undefined,
-        errmsg: undefined,
-        createTime: undefined,
-        timestamp: undefined
-      };
-      this.resetForm('form');
-    },
     /** 搜索按钮操作 */
     handleQuery() {
-      this.pageParams.pageNum = 1;
+      this.formParams.pageNum = 1;
       this.getList();
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.resetForm('queryForm');
-      this.handleQuery();
+      this.resetForm('formParams')
+      this.$refs.searchForm.resetQueryForm('queryForm');
     },
 
     //
