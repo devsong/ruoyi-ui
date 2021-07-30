@@ -230,8 +230,12 @@ export default {
       this.loading = true;
       list(this.addDateRange(this.queryParams, this.dateRange)).then(
         (response) => {
-          this.list = response.data;
-          this.total = response.page.total;
+          if(response.code == 200){
+            this.list = response.rows;
+            this.total = response.total;
+          }else{
+            this.msgError(response.msg);
+          }
           this.loading = false;
         }
       );
