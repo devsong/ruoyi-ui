@@ -74,7 +74,8 @@
     />
 
     <el-dialog title="明细" :visible.sync="open" width="700px" height="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">{{ detailMsg }}</el-form>
+      <vue-json-editor v-model="detailMsg" :show-btns="true" :expandedOnStart="true"></vue-json-editor>
+      <!--<el-form ref="form" :model="form" :rules="rules" label-width="80px">{{ detailMsg }}</el-form> -->
       <div slot="footer" class="dialog-footer">
         <el-button @click="cancel">取 消</el-button>
       </div>
@@ -97,12 +98,14 @@
 </style>
 
 <script>
+import VueJsonEditor from 'vue-json-editor';
 import { listLog, getMetaLog } from '@/api/monitor/perflog';
 import PerfSearch from './PerfSearch.vue'
 export default {
   name: 'Sysperflog',
   components:{
-    PerfSearch 
+    PerfSearch,
+    VueJsonEditor
   },
   data() {
     return {
