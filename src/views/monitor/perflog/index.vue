@@ -74,7 +74,8 @@
     />
 
     <el-dialog title="明细" :visible.sync="open" width="700px" height="500px" append-to-body>
-      <vue-json-editor v-model="detailMsg" :show-btns="true" :expandedOnStart="true"></vue-json-editor>
+      <vue-json-pretty ref="popDialogMsg" ></vue-json-pretty>
+      <!-- <pre v-show="!isJsonMsg">{{detailMsg}}</pre> -->
       <!--<el-form ref="form" :model="form" :rules="rules" label-width="80px">{{ detailMsg }}</el-form> -->
       <div slot="footer" class="dialog-footer">
         <el-button @click="cancel">取 消</el-button>
@@ -98,17 +99,17 @@
 </style>
 
 <script>
-import VueJsonEditor from 'vue-json-editor';
+import VueJsonPretty from '@/components/VueJsonPretty'
 import { listLog, getMetaLog } from '@/api/monitor/perflog';
 import PerfSearch from './PerfSearch.vue'
 export default {
   name: 'Sysperflog',
   components:{
     PerfSearch,
-    VueJsonEditor
+    VueJsonPretty
   },
   data() {
-    return {
+     return {
       // 遮罩层
       loading: false,
       // 选中数组
@@ -184,7 +185,14 @@ export default {
       const index = column.index;
       if (index === 4 || index === 8 || index === 9 || index === 11) {
         this.open = true;
-        this.detailMsg = cell.innerText;
+        let msg = cell.innerText;
+        try {
+          msg = JSON.parse(msg);
+        } catch (error) {
+          // this.detailMsg = msg;
+          msg = {'class':msg};
+        }
+        this.$refs.popDialogMsg.data = msg;
       }
     },
 
