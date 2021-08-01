@@ -74,9 +74,8 @@
     />
 
     <el-dialog title="明细" :visible.sync="open" width="700px" height="500px" append-to-body>
-      <vue-json-pretty ref="popDialogMsg" ></vue-json-pretty>
+      <json-viewer v-model="detailMsg" :expand-depth=5 copyable='{"copyText":"复制","copiedText":"已复制"}' boxed sort></json-viewer>
       <!-- <pre v-show="!isJsonMsg">{{detailMsg}}</pre> -->
-      <!--<el-form ref="form" :model="form" :rules="rules" label-width="80px">{{ detailMsg }}</el-form> -->
       <div slot="footer" class="dialog-footer">
         <el-button @click="cancel">取 消</el-button>
       </div>
@@ -99,14 +98,15 @@
 </style>
 
 <script>
-import VueJsonPretty from '@/components/VueJsonPretty'
+import JsonViewer from 'vue-json-viewer'
 import { listLog, getMetaLog } from '@/api/monitor/perflog';
 import PerfSearch from './PerfSearch.vue'
 export default {
   name: 'Sysperflog',
   components:{
     PerfSearch,
-    VueJsonPretty
+    VueJsonPretty,
+    JsonViewer
   },
   data() {
      return {
@@ -136,7 +136,7 @@ export default {
         pageSize: 10
       },
       // 明细日志
-      detailMsg: '',
+      detailMsg: {},
       // 表单校验
       rules: {
 
@@ -189,10 +189,9 @@ export default {
         try {
           msg = JSON.parse(msg);
         } catch (error) {
-          // this.detailMsg = msg;
           msg = {'class':msg};
         }
-        this.$refs.popDialogMsg.data = msg;
+        this.detailMsg = msg;
       }
     },
 
