@@ -3,25 +3,25 @@ import request from '@/utils/request';
 // 列表
 export function list(query) {
   return request({
-    url: '/serial/segment/list',
-    method: 'get',
+    url: "/system/serial/list",
+    method: "get",
     params: query
   });
 }
 
 export function getBizKey(bizKey) {
   return request({
-    url: '/serial/segment/get',
-    method: 'get',
-    params: { 'bizKey': bizKey }
+    url: "/system/serial/get",
+    method: "get",
+    params: { bizKey: bizKey }
   });
 }
 
 // 新增
 export function addSegment(form) {
   return request({
-    url: '/serial/segment/add',
-    method: 'post',
+    url: "/system/serial/add",
+    method: "post",
     params: form
   });
 }
@@ -29,7 +29,7 @@ export function addSegment(form) {
 // 修改
 export function updateSegment(form) {
   return request({
-    url: '/serial/segment/update',
+    url: '/system/serial/update',
     method: 'post',
     params: form
   });
@@ -38,8 +38,8 @@ export function updateSegment(form) {
 // 导出操作日志
 export function exportBizKey(query) {
   return request({
-    url: '/serial/segment/export',
-    method: 'get',
+    url: "/system/serial/export",
+    method: "get",
     params: query
   });
 }
@@ -47,8 +47,8 @@ export function exportBizKey(query) {
 // 修改状态
 export function changeSegmentStatus(key, status) {
   return request({
-    url: '/serial/segment/update_status',
-    method: 'post',
+    url: "/system/serial/update_status",
+    method: "post",
     params: {
       key: key,
       status: status
