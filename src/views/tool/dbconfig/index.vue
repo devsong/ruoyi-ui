@@ -19,11 +19,6 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="请选择状态" clearable size="small">
-          <el-option label="请选择字典生成" value="" />
-        </el-select>
-      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -78,7 +73,16 @@
       <el-table-column label="数据库名" align="center" prop="dbschema" />
       <el-table-column label="用户名" align="center" prop="dbuser" />
       <el-table-column label="密码" align="center" prop="pwd" />
-      <el-table-column label="状态" align="center" prop="status" />
+      <el-table-column align="center" label="状态" prop="status">
+        <template slot-scope="scope">
+          <el-switch
+            :active-value="0"
+            :inactive-value="1"
+            @change="handleStatusChange(scope.row)"
+            v-model="scope.row.status"
+          />
+        </template>
+       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -123,9 +127,9 @@
           <el-input v-model="form.pwd" placeholder="请输入密码" />
         </el-form-item>
         <el-form-item label="状态">
-          <el-radio-group v-model="form.status">
-            <el-radio label="1">请选择字典生成</el-radio>
-          </el-radio-group>
+          <template>
+            <el-switch :active-value="0" :inactive-value="1" v-model="form.status" />
+          </template>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -137,7 +141,7 @@
 </template>
 
 <script>
-import { listDbconfig, getDbconfig, delDbconfig, addDbconfig, updateDbconfig, exportDbconfig } from "@/api/tool/dbconfig";
+import { listDbconfig, getDbconfig, delDbconfig, addDbconfig, updateDbconfig, exportDbconfig, changeStatus } from "@/api/tool/dbconfig";
 
 export default {
   name: "Dbconfig",
@@ -215,7 +219,7 @@ export default {
         dbschema: undefined,
         dbuser: undefined,
         pwd: undefined,
-        status: "0",
+        status: undefined,
         createTime: undefined,
         updateTime: undefined
       };
@@ -303,6 +307,21 @@ export default {
         }).then(response => {
           this.download(response.msg);
         }).catch(function() {});
+    },
+    handleStatusChange(row) {
+      const text = row.status == "0" ? "启用" : "停用";
+      this.$confirm("确认要" + text + '"' + row.key + '"的业务key?', "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(function () {
+        return changeStatus(row.key, row.status);
+      }).then(() => {
+        this.msgSuccess(text + "成功");
+        this.getList();
+      }).catch(function () {
+        row.status = row.status == "0" ? "1" : "0";
+      });
     }
   }
 };
