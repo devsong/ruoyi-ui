@@ -141,6 +141,7 @@
         </template>
       </el-table-column>
     </el-table>
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -149,7 +150,13 @@
       @pagination="getList"
     />
     <!-- 预览界面 -->
-    <el-dialog :title="preview.title" :visible.sync="preview.open" width="80%" top="5vh" append-to-body>
+    <el-dialog
+      :title="preview.title"
+      :visible.sync="preview.open"
+      width="80%"
+      top="5vh"
+      append-to-body
+    >
       <el-tabs v-model="preview.activeName">
         <el-tab-pane
           v-for="(value, key) in preview.data"
@@ -157,7 +164,16 @@
           :name="key.substring(key.lastIndexOf('/')+1,key.indexOf('.vm'))"
           :key="key"
         >
-          <pre>{{ value }}</pre>
+        <div>
+          <button class="copy-text" 
+            v-clipboard:copy="value"  
+            v-clipboard:success="onCopySuccess"
+            v-clipboard:error="onCopyError"
+          >
+            复制
+          </button>
+          <pre id="code"> {{ value }}</pre>
+        </div>
         </el-tab-pane>
       </el-tabs>
     </el-dialog>
@@ -211,6 +227,10 @@ export default {
   created() {
     this.getList();
   },
+  mounted() {
+  },
+  destroyed() {
+  },
   activated() {
     const time = this.$route.query.t;
     if (time != null && time != this.uniqueId) {
@@ -219,14 +239,20 @@ export default {
     }
   },
   methods: {
+    onCopySuccess(){
+      alert('复制成功');
+    },
+    onCopyError(){
+      alert('复制失败');
+    },
     /** 查询表集合 */
     getList() {
       this.loading = true;
       listTable(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
-          this.tableList = response.rows;
-          this.total = response.total;
-          this.loading = false;
-        }
+        this.tableList = response.rows;
+        this.total = response.total;
+        this.loading = false;
+      }
       );
     },
     /** 搜索按钮操作 */
@@ -241,7 +267,7 @@ export default {
         this.msgError("请选择要生成的数据");
         return;
       }
-      if(row.genType === "1") {
+      if (row.genType === "1") {
         genCode(row.tableName).then(response => {
           this.msgSuccess("成功生成到自定义路径：" + row.genPath);
         });
@@ -285,13 +311,27 @@ export default {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
-      }).then(function() {
-          return delTable(tableIds);
+      }).then(function () {
+        return delTable(tableIds);
       }).then(() => {
-          this.getList();
-          this.msgSuccess("删除成功");
-      }).catch(function() {});
+        this.getList();
+        this.msgSuccess("删除成功");
+      }).catch(function () { });
     }
   }
 };
 </script>
+
+<style>
+.copy {
+  background: white;
+  width: 100%;
+  height: 400px;
+  border: 1px solid #000;
+}
+.copy-text {
+  float: right;
+  margin-right: 20px;
+  cursor: pointer;
+}
+</style>

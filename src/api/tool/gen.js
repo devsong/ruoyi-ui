@@ -17,6 +17,14 @@ export function listDbTable(query) {
   })
 }
 
+// 查询数据库列表
+export function listSchemas(query) {
+  return request({
+    url: '/tool/gen/schemas',
+    method: 'get',
+  })
+}
+
 // 查询表详细信息
 export function getGenTable(tableId) {
   return request({

@@ -2,15 +2,25 @@
 <template>
   <div class="app-container">
     <el-form :inline="true" :model="queryParams" label-width="68px" ref="queryForm">
-      <el-form-item label="业务key" prop="name">
+      <el-form-item label="业务key" prop="key">
         <el-input
           @keyup.enter.native="handleQuery"
           clearable
           placeholder="请输入业务key"
           size="small"
           style="width: 240px"
-          v-model="queryParams.name"
+          v-model="queryParams.key"
         />
+      </el-form-item>
+
+      <el-form-item label="状态" prop="status">
+         <el-select
+          filterable
+          v-model="queryParams.status"
+          placeholder="请选择"
+        >
+          <el-option v-for="item in option.status" :key="item.code" :label="item.desc" :value="item.code" />
+          </el-select>
       </el-form-item>
 
       <el-form-item label="操作时间">
@@ -173,7 +183,7 @@
 </template>
 
 <script>
-import { list, getBizKey, addSegment, updateSegment, changeSegmentStatus, getSegmentKey } from "@/api/serial/index";
+import { list, getStatus,getBizKey, addSegment, updateSegment, changeSegmentStatus, getSegmentKey } from "@/api/serial/index";
 import Base32Dialog from './base32';
 import Base62Dialog from './base62';
 import SnowflakeDialog from './snowflake';
@@ -212,7 +222,11 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        name: undefined,
+        key: undefined,
+        status:undefined,
+      },
+      option:{
+        status:undefined,
       },
       snowflakeFlag: false,
       base32Flag: false,
@@ -223,6 +237,13 @@ export default {
     this.getList();
     this.getDicts("sys_normal_disable").then((response) => {
       this.statusOptions = response.data;
+    });
+    getStatus().then((response)=>{
+      if(response.code == 200){
+        this.option.status = response.data;
+      }else{
+        this.msgError(response.msg);
+      }
     });
   },
   methods: {

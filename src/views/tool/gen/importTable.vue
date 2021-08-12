@@ -2,6 +2,27 @@
   <!-- 导入表 -->
   <el-dialog title="导入表" :visible.sync="visible" width="800px" top="5vh" append-to-body>
     <el-form :model="queryParams" ref="queryForm" :inline="true">
+      <el-form-item label="数据源" prop="jdbcUrl">
+        <el-select filterable v-model="queryParams.schema" placeholder="请选择">
+          <el-option
+            v-for="item in jdbcUrl"
+            :key="item"
+            :label="item"
+            :value="item"
+          />
+        </el-select>
+      </el-form-item>
+      
+      <el-form-item label="数据库" prop="schema">
+        <el-select filterable v-model="queryParams.schema" placeholder="请选择">
+          <el-option
+            v-for="item in schemas"
+            :key="item"
+            :label="item"
+            :value="item"
+          />
+        </el-select>
+      </el-form-item>
       <el-form-item label="表名称" prop="tableName">
         <el-input
           v-model="queryParams.tableName"
@@ -26,7 +47,13 @@
       </el-form-item>
     </el-form>
     <el-row>
-      <el-table @row-click="clickRow" ref="table" :data="dbTableList" @selection-change="handleSelectionChange" height="260px">
+      <el-table
+        @row-click="clickRow"
+        ref="table"
+        :data="dbTableList"
+        @selection-change="handleSelectionChange"
+        height="260px"
+      >
         <el-table-column type="selection" width="55"></el-table-column>
         <el-table-column prop="tableName" label="表名称" :show-overflow-tooltip="true"></el-table-column>
         <el-table-column prop="tableComment" label="表描述" :show-overflow-tooltip="true"></el-table-column>
@@ -49,7 +76,7 @@
 </template>
 
 <script>
-import { listDbTable, importTable } from "@/api/tool/gen";
+import { listDbTable, importTable, listSchemas } from "@/api/tool/gen";
 export default {
   data() {
     return {
@@ -59,12 +86,17 @@ export default {
       tables: [],
       // 总条数
       total: 0,
+      // 数据源列表
+      jdbcUrl:[],
+      // 数据库列表
+      schemas: [],
       // 表数据
       dbTableList: [],
       // 查询参数
       queryParams: {
         pageNum: 1,
         pageSize: 10,
+        schema:'ruoyi_vue',
         tableName: undefined,
         tableComment: undefined
       }
@@ -89,6 +121,18 @@ export default {
         if (res.code === 200) {
           this.dbTableList = res.rows;
           this.total = res.total;
+        }
+      });
+    },
+    // 获取数据源列表
+    getJdbcUrl(){
+
+    },
+    // 获取数据库列表
+    getSchemas() {
+      listSchemas().then(response => {
+        if (response.code == 200) {
+          this.schemas = response.data;
         }
       });
     },

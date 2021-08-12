@@ -19,6 +19,7 @@ import { getDicts } from '@/api/system/dict/data';
 import { getConfigKey } from '@/api/system/config';
 import { parseTime, resetForm, addDateRange, selectDictLabel, selectDictLabels, download, handleTree } from '@/utils/ruoyi';
 import Pagination from '@/components/Pagination';
+import VueClipboard from "vue-clipboard2";
 
 // 全局方法挂载
 Vue.prototype.getDicts = getDicts;
@@ -42,6 +43,9 @@ Vue.prototype.msgError = function(msg) {
 Vue.prototype.msgInfo = function(msg) {
   this.$message.info(msg);
 };
+
+// 剪贴板
+Vue.use(VueClipboard);
 
 // 全局组件挂载
 Vue.component('Pagination', Pagination);

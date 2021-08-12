@@ -9,6 +9,14 @@ export function list(query) {
   });
 }
 
+// 获取状态列表
+export function getStatus() {
+  return request({
+    url: "/system/serial/get_status",
+    method: "get"
+  });
+}
+
 export function getBizKey(bizKey) {
   return request({
     url: "/system/serial/get",
