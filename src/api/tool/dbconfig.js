@@ -36,11 +36,14 @@ export function updateDbconfig(data) {
 }
 
 // 修改状态
-export function changeStatus(data) {
+export function changeStatus(id,status) {
   return request({
     url: "/tool/dbconfig/change_status",
     method: "post",
-    data: data
+    params: {
+      id:id,
+      status:status
+    }
   });
 }
 

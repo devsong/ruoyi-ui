@@ -3,7 +3,7 @@
   <el-dialog title="导入表" :visible.sync="visible" width="800px" top="5vh" append-to-body>
     <el-form :model="queryParams" ref="queryForm" :inline="true">
       <el-form-item label="数据源" prop="jdbcUrl">
-        <el-select filterable v-model="queryParams.schema" placeholder="请选择">
+        <el-select filterable v-model="queryParams.schema" placeholder="请选择" @change="jdbcUrlChange">
           <el-option
             v-for="item in jdbcUrl"
             :key="item"
@@ -102,6 +102,9 @@ export default {
       }
     };
   },
+  mounted(){
+    this.getJdbcUrl();
+  },
   methods: {
     // 显示弹框
     show() {
@@ -126,6 +129,9 @@ export default {
     },
     // 获取数据源列表
     getJdbcUrl(){
+
+    },
+    jdbcUrlChange(){
 
     },
     // 获取数据库列表
