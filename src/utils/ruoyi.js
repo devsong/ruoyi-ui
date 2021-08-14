@@ -142,7 +142,7 @@ export function handleTree(data, id, parentId, children, rootId) {
     });
     branchArr.length > 0 ? father.children = branchArr : '';
     // 返回第一层
-    return father[parentId] === rootId;
+    return parseInt(father[parentId]) === rootId;
   });
   return treeData != '' ? treeData : data;
 }

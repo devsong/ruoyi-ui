@@ -74,8 +74,7 @@
     />
 
     <el-dialog title="明细" :visible.sync="open" width="700px" height="500px" append-to-body>
-      <json-viewer v-model="detailMsg" :expand-depth=5 copyable='{"copyText":"复制","copiedText":"已复制"}' boxed sort></json-viewer>
-      <!-- <pre v-show="!isJsonMsg">{{detailMsg}}</pre> -->
+      <json-viewer v-model="detailMsg" :expand-depth=5 copyable boxed sort></json-viewer>
       <div slot="footer" class="dialog-footer">
         <el-button @click="cancel">取 消</el-button>
       </div>
@@ -105,7 +104,6 @@ export default {
   name: 'Sysperflog',
   components:{
     PerfSearch,
-    VueJsonPretty,
     JsonViewer
   },
   data() {

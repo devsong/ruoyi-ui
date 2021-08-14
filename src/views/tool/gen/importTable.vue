@@ -2,19 +2,19 @@
   <!-- 导入表 -->
   <el-dialog title="导入表" :visible.sync="visible" width="800px" top="5vh" append-to-body>
     <el-form :model="queryParams" ref="queryForm" :inline="true">
-      <el-form-item label="数据源" prop="jdbcUrl">
-        <el-select filterable v-model="queryParams.schema" placeholder="请选择" @change="jdbcUrlChange">
+      <el-form-item label="数据源" prop="tableDbid">
+        <el-select filterable v-model="queryParams.tableDbid" placeholder="请选择" @change="dbChange">
           <el-option
             v-for="item in jdbcUrl"
-            :key="item"
-            :label="item"
-            :value="item"
+            :key="item.id"
+            :label="item.dbschema"
+            :value="item.id"
           />
         </el-select>
       </el-form-item>
       
-      <el-form-item label="数据库" prop="schema">
-        <el-select filterable v-model="queryParams.schema" placeholder="请选择">
+      <el-form-item label="数据库" prop="tableSchema">
+        <el-select filterable v-model="queryParams.tableSchema" placeholder="请选择">
           <el-option
             v-for="item in schemas"
             :key="item"
@@ -77,6 +77,8 @@
 
 <script>
 import { listDbTable, importTable, listSchemas } from "@/api/tool/gen";
+import { listDbconfig } from "@/api/tool/dbconfig";
+
 export default {
   data() {
     return {
@@ -96,7 +98,8 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        schema:'ruoyi_vue',
+        tableDbid:undefined,
+        tableSchema:undefined,
         tableName: undefined,
         tableComment: undefined
       }
@@ -120,6 +123,9 @@ export default {
     },
     // 查询表数据
     getList() {
+      if(this.queryParams.tableDbid == null || this.queryParams.tableSchema == null){
+        return;
+      }
       listDbTable(this.queryParams).then(res => {
         if (res.code === 200) {
           this.dbTableList = res.rows;
@@ -129,16 +135,29 @@ export default {
     },
     // 获取数据源列表
     getJdbcUrl(){
-
-    },
-    jdbcUrlChange(){
-
+      listDbconfig().then(res=>{
+        if(res.code == 200){
+          this.jdbcUrl = res.rows;
+          this.queryParams.tableDbid = res.rows[0].tableDbid;
+          this.getSchemas();
+        }else{
+          this.msgError(res.msg);
+        }
+      });
     },
     // 获取数据库列表
-    getSchemas() {
-      listSchemas().then(response => {
-        if (response.code == 200) {
-          this.schemas = response.data;
+    dbChange(){
+      this.getSchemas();
+    },
+    getSchemas(){
+      if(this.queryParams.tableDbid == null){
+        return;
+      }
+      listSchemas(this.queryParams.tableDbid).then(res => {
+        if (res.code == 200) {
+          this.schemas = res.data;
+        }else{
+          this.msgError(res.msg);
         }
       });
     },
@@ -154,7 +173,7 @@ export default {
     },
     /** 导入按钮操作 */
     handleImportTable() {
-      importTable({ tables: this.tables.join(",") }).then(res => {
+      importTable({dbId:this.queryParams.tableDbid,schema:this.queryParams.tableSchema, tables: this.tables.join(",") }).then(res => {
         this.msgSuccess(res.msg);
         if (res.code === 200) {
           this.visible = false;
