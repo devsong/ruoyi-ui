@@ -187,7 +187,7 @@ export default {
         try {
           msg = JSON.parse(msg);
         } catch (error) {
-          msg = {'class':msg};
+          msg = {'msg':msg};
         }
         this.detailMsg = msg;
       }
