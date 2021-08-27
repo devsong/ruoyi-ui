@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
-      <el-form-item label="应用APPID" prop="appId">
+      <el-form-item label="APPID" prop="appId">
         <el-input
           v-model="queryParams.appId"
           placeholder="请输入应用APPID"
@@ -42,7 +42,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['payment:config:add']"
+          v-hasPermi="['payment:config:edit']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -62,38 +62,37 @@
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['payment:config:remove']"
+          v-hasPermi="['payment:config:edit']"
         >删除</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="warning"
-          icon="el-icon-download"
-          size="mini"
-          @click="handleExport"
-          v-hasPermi="['payment:config:export']"
-        >导出</el-button>
       </el-col>
     </el-row>
 
-    <el-table v-loading="loading" :data="configList" @selection-change="handleSelectionChange">
+    <el-table
+      v-loading="loading"
+      :data="configList"
+      :cell-class-name="tableCellClassName"
+      @selection-change="handleSelectionChange"
+      @cell-dblclick="handleCellDbClick"
+    >
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="主键ID" align="center" prop="id" />
       <el-table-column label="应用APPID" align="center" prop="appId" />
       <el-table-column label="支付渠道" align="center" prop="channel" :formatter="channelFormat" />
       <el-table-column label="应用描述" align="center" prop="appDesc" />
-      <el-table-column label="应用加密key" align="center" prop="appSecret" />
-      <el-table-column align="center" label="状态" prop="state">
+      <el-table-column label="应用密钥" align="center" prop="appSecret" />
+      <el-table-column label="商户号" align="center" prop="mchId" />
+      <el-table-column align="center" label="状态" prop="status">
         <template slot-scope="scope">
           <el-switch
             :active-value="0"
             :inactive-value="1"
             @change="handleStatusChange(scope.row)"
-            v-model="scope.row.state"
+            v-model="scope.row.status"
           />
         </template>
-       </el-table-column>
-      <el-table-column label="公钥私钥对" align="center" prop="pubPrivKey" />
+      </el-table-column>
+      <el-table-column :show-overflow-tooltip="true" label="公钥" align="center" prop="pubKey" />
+      <el-table-column :show-overflow-tooltip="true" label="私钥" align="center" prop="privKey" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -113,7 +112,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -123,34 +122,58 @@
     />
 
     <!-- 添加或修改支付配置对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="应用APPID" prop="appId">
-          <el-input v-model="form.appId" placeholder="请输入应用APPID" />
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="APPID" prop="appId">
+              <el-input v-model="form.appId" placeholder="请输入应用APPID" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="支付渠道">
+              <el-select v-model="form.channel" placeholder="请选择支付渠道">
+                <el-option
+                  v-for="dict in channelOptions"
+                  :key="dict.dictValue"
+                  :label="dict.dictLabel"
+                  :value="parseInt(dict.dictValue)"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="应用描述" prop="appDesc">
+              <el-input v-model="form.appDesc" placeholder="请输入应用描述" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="secret" prop="appSecret">
+              <el-input v-model="form.appSecret" placeholder="请输入应用加密key" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="mchId" prop="mchId">
+              <el-input v-model="form.mchId" placeholder="请输入商户号" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="状态">
+              <template>
+                <el-switch :active-value="0" :inactive-value="1" v-model="form.status" />
+              </template>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label="公钥" prop="pubKey">
+          <el-input type="textarea" :rows="3" v-model="form.pubKey" placeholder="请输入公钥" />
         </el-form-item>
-        <el-form-item label="支付渠道">
-          <el-select v-model="form.channel" placeholder="请选择支付渠道">
-            <el-option
-              v-for="dict in channelOptions"
-              :key="dict.dictValue"
-              :label="dict.dictLabel"
-              :value="parseInt(dict.dictValue)"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="应用描述" prop="appDesc">
-          <el-input v-model="form.appDesc" placeholder="请输入应用描述" />
-        </el-form-item>
-        <el-form-item label="应用加密key" prop="appSecret">
-          <el-input v-model="form.appSecret" placeholder="请输入应用加密key" />
-        </el-form-item>
-        <el-form-item label="状态">
-          <template>
-            <el-switch :active-value="0" :inactive-value="1" v-model="form.state" />
-          </template>
-        </el-form-item>
-        <el-form-item label="公钥私钥对" prop="pubPrivKey">
-          <el-input v-model="form.pubPrivKey" placeholder="请输入公钥私钥对" />
+        <el-form-item label="私钥" prop="privKey">
+          <el-input type="textarea" :rows="3" v-model="form.privKey" placeholder="请输入私钥" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -158,14 +181,19 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
+    <detail-dialog ref="detailDialog" />
   </div>
 </template>
 
 <script>
-import { listConfig, getConfig, delConfig, addConfig, updateConfig, exportConfig, changeStatus} from "@/api/payment/config";
-
+import { listConfig, getConfig, delConfig, addConfig, updateConfig, changeStatus } from "@/api/payment/config";
+import DetailDialog from '@/components/DetailDialog'
 export default {
   name: "Config",
+  components:{
+    DetailDialog
+  },
   data() {
     return {
       // 遮罩层
@@ -187,7 +215,7 @@ export default {
       // 支付渠道字典
       channelOptions: [],
       // 状态字典
-      stateOptions: [],
+      statusOptions: [],
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -195,7 +223,7 @@ export default {
         appId: undefined,
         channel: undefined,
         appDesc: undefined,
-        state: undefined,
+        status: undefined,
       },
       // 表单参数
       form: {},
@@ -213,7 +241,7 @@ export default {
         appSecret: [
           { required: true, message: "应用加密key不能为空", trigger: "blur" }
         ],
-        state: [
+        status: [
           { required: true, message: "状态不能为空", trigger: "blur" }
         ],
         pubPrivKey: [
@@ -234,7 +262,7 @@ export default {
       this.channelOptions = response.data;
     });
     this.getDicts("sys_common_status").then(response => {
-      this.stateOptions = response.data;
+      this.statusOptions = response.data;
     });
   },
   methods: {
@@ -252,8 +280,8 @@ export default {
       return this.selectDictLabel(this.channelOptions, row.channel);
     },
     // 状态字典翻译
-    stateFormat(row, column) {
-      return this.selectDictLabel(this.stateOptions, row.state);
+    statusFormat(row, column) {
+      return this.selectDictLabel(this.statusOptions, row.status);
     },
     // 取消按钮
     cancel() {
@@ -268,8 +296,10 @@ export default {
         channel: undefined,
         appDesc: undefined,
         appSecret: undefined,
-        state: undefined,
-        pubPrivKey: undefined,
+        mchId: undefined,
+        status: undefined,
+        pubKey: undefined,
+        privKey: undefined,
         createTime: undefined,
         updateTime: undefined
       };
@@ -288,7 +318,7 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.id)
-      this.single = selection.length!=1
+      this.single = selection.length != 1
       this.multiple = !selection.length
     },
     /** 新增按钮操作 */
@@ -303,12 +333,13 @@ export default {
       const id = row.id || this.ids
       getConfig(id).then(response => {
         this.form = response.data;
+        this.form.channel = parseInt(this.form.channel);
         this.open = true;
         this.title = "修改支付配置";
       });
     },
     /** 提交按钮 */
-    submitForm: function() {
+    submitForm: function () {
       this.$refs["form"].validate(valid => {
         if (valid) {
           if (this.form.id != undefined) {
@@ -335,29 +366,17 @@ export default {
     handleDelete(row) {
       const ids = row.id || this.ids;
       this.$confirm('是否确认删除支付配置编号为"' + ids + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return delConfig(ids);
-        }).then(() => {
-          this.getList();
-          this.msgSuccess("删除成功");
-        }).catch(function() {});
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(function () {
+        return delConfig(ids);
+      }).then(() => {
+        this.getList();
+        this.msgSuccess("删除成功");
+      }).catch(function () { });
     },
-    /** 导出按钮操作 */
-    handleExport() {
-      const queryParams = this.queryParams;
-      this.$confirm('是否确认导出所有支付配置数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return exportConfig(queryParams);
-        }).then(response => {
-          this.download(response.msg);
-        }).catch(function() {});
-    },
+
     handleStatusChange(row) {
       const text = row.status == "0" ? "启用" : "停用";
       this.$confirm("确认要" + text + '"' + row.key + '"的业务key?', "警告", {
@@ -372,6 +391,26 @@ export default {
       }).catch(function () {
         row.status = row.status == "0" ? "1" : "0";
       });
+    },
+
+    tableCellClassName({ row, column, rowIndex, columnIndex }) {
+      row.index = rowIndex;
+      column.index = columnIndex;
+    },
+
+    handleCellDbClick(row, column, cell, event) {
+      //8 9列的数据较长,弹出对话框显示
+      const index = column.index;
+      console.log('index:'+index);
+      if (index === 8 || index === 9) {
+        let msg = cell.innerText;
+        try {
+          msg = JSON.parse(msg);
+        } catch (error) {
+          msg = { 'msg': msg };
+        }
+        this.$refs.detailDialog.openDialog(msg);
+      }
     }
   }
 };

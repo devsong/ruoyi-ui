@@ -14,7 +14,7 @@
       </el-form-item>
     </el-form>
 
-    <el-row class="btn-group">
+    <el-row>
       <el-col :span="2">
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
       </el-col>
@@ -25,7 +25,6 @@
 
     <el-table
       v-loading="loading"
-      class="cell-limit"
       :data="logList"
       :cell-class-name="tableCellClassName"
       height="500"
@@ -73,38 +72,22 @@
       @pagination="getList"
     />
 
-    <el-dialog title="明细" :visible.sync="open" width="700px" height="500px" append-to-body>
-      <json-viewer v-model="detailMsg" :expand-depth=5 copyable boxed sort></json-viewer>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="cancel">取 消</el-button>
-      </div>
-    </el-dialog>
+    <detail-dialog ref="detailDialog" />
   </div>
 </template>
 
-<style lang="scss" scope>
-.cell-limit tr td .cell {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2; /*可以显示的行数，超出部分用...表示 */
-  -webkit-box-orient: vertical;
-}
 
-.btn-group{
-  padding:0 0 10px 0px;
-}
-</style>
 
 <script>
-import JsonViewer from 'vue-json-viewer'
-import { listLog, getMetaLog } from '@/api/monitor/perflog';
+import { listLog } from '@/api/monitor/perflog';
+
+import DetailDialog from '@/components/DetailDialog'
 import PerfSearch from './PerfSearch.vue'
 export default {
   name: 'Sysperflog',
   components:{
     PerfSearch,
-    JsonViewer
+    DetailDialog
   },
   data() {
      return {
@@ -159,7 +142,7 @@ export default {
     // 取消按钮
     cancel() {
       this.open = false;
-      this.detailMsg = '';
+      this.detailMsg = {};
     },
     /** 搜索按钮操作 */
     handleQuery() {
@@ -172,41 +155,25 @@ export default {
       this.$refs.searchForm.resetQueryForm('queryForm');
     },
 
-    //
     tableCellClassName({ row, column, rowIndex, columnIndex }) {
       row.index = rowIndex;
       column.index = columnIndex;
     },
 
     handleCellDbClick(row, column, cell, event) {
-      // 4  8 9 11列的数据较长,需要弹出对话框显示
+      // 4  8 9 11列的数据较长,弹出对话框显示
       const index = column.index;
+      console.log('index:'+index);
       if (index === 4 || index === 8 || index === 9 || index === 11) {
-        this.open = true;
         let msg = cell.innerText;
         try {
           msg = JSON.parse(msg);
         } catch (error) {
           msg = {'msg':msg};
         }
-        this.detailMsg = msg;
+        this.$refs.detailDialog.openDialog(msg);
       }
-    },
-
-    // ip
-    // handleMethodChange() {
-    //   const query = {
-    //     level: 6,
-    //     product: this.queryParams.product,
-    //     group: this.queryParams.group,
-    //     app: this.queryParams.app,
-    //     method: this.queryParams.method
-    //   };
-    //   getMetaLog(query).then(response => {
-    //     this.option.operatorIps = response.data;
-    //     this.option.operatorIps.push('*');
-    //   });
-    // },
+    }
 
   }
 };

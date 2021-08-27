@@ -123,11 +123,6 @@ export default {
   methods: {
     // 表单重置
     resetQueryForm() {
-      // this.option.products = [],
-      // this.option.groups = [],
-      // this.option.apps = [],
-      // this.option.clazzs = [],
-      // this.option.methods = [],
       this.queryParams.product = undefined;
       this.queryParams.group = undefined;
       this.queryParams.app = undefined;

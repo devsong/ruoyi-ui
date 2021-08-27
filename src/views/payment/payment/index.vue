@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
-      <el-form-item label="支付流水号" prop="serial">
+      <el-form-item label="流水号" prop="serial">
         <el-input
           v-model="queryParams.serial"
           placeholder="请输入支付流水号"
@@ -93,67 +93,6 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
-
-    <!-- 添加或修改支付请求对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="订单号" prop="orderId">
-          <el-input v-model="form.orderId" placeholder="请输入订单号" />
-        </el-form-item>
-        <el-form-item label="订单来源">
-          <el-select v-model="form.orderFrom" placeholder="请选择订单来源">
-            <el-option
-              v-for="dict in orderFromOptions"
-              :key="dict.dictValue"
-              :label="dict.dictLabel"
-              :value="parseInt(dict.dictValue)"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="会员ID" prop="memberId">
-          <el-input v-model="form.memberId" placeholder="请输入会员ID" />
-        </el-form-item>
-        <el-form-item label="支付渠道">
-          <el-select v-model="form.channel" placeholder="请选择支付渠道">
-            <el-option
-              v-for="dict in channelOptions"
-              :key="dict.dictValue"
-              :label="dict.dictLabel"
-              :value="parseInt(dict.dictValue)"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="支付金额(以分为单位)" prop="amt">
-          <el-input v-model="form.amt" placeholder="请输入支付金额(以分为单位)" />
-        </el-form-item>
-        <el-form-item label="支付商品描述" prop="subject">
-          <el-input v-model="form.subject" placeholder="请输入支付商品描述" />
-        </el-form-item>
-        <el-form-item label="支付状态">
-          <el-select v-model="form.status" placeholder="请选择支付状态">
-            <el-option
-              v-for="dict in statusOptions"
-              :key="dict.dictValue"
-              :label="dict.dictLabel"
-              :value="dict.dictValue"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="调用方名称" prop="clientName">
-          <el-input v-model="form.clientName" placeholder="请输入调用方名称" />
-        </el-form-item>
-        <el-form-item label="操作人" prop="operator">
-          <el-input v-model="form.operator" placeholder="请输入操作人" />
-        </el-form-item>
-        <el-form-item label="操作来源IP" prop="operatorIp">
-          <el-input v-model="form.operatorIp" placeholder="请输入操作来源IP" />
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
-        <el-button @click="cancel">取 消</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
