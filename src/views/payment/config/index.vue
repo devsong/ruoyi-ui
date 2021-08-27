@@ -379,12 +379,12 @@ export default {
 
     handleStatusChange(row) {
       const text = row.status == "0" ? "启用" : "停用";
-      this.$confirm("确认要" + text + '"' + row.key + '"的业务key?', "警告", {
+      this.$confirm("确认要" + text + '"' + row.appDesc + '"的支付渠道?', "警告", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
       }).then(function () {
-        return changeStatus(row.key, row.status);
+        return changeStatus({'id':row.id, 'status':row.status});
       }).then(() => {
         this.msgSuccess(text + "成功");
         this.getList();

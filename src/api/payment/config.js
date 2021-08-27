@@ -36,11 +36,11 @@ export function updateConfig(data) {
 }
 
 // 修改状态
-export function changeStatus(data) {
+export function changeStatus(params) {
   return request({
     url: "/system/payment_config/change_status",
     method: "post",
-    data: data
+    params: params
   });
 }
 
