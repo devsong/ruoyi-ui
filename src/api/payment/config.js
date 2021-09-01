@@ -1,4 +1,4 @@
-import request from '@/utils/request'
+import request from "@/utils/request";
 
 // 查询支付配置列表
 export function listConfig(query) {
@@ -22,7 +22,7 @@ export function addConfig(data) {
   return request({
     url: "/system/payment_config/",
     method: "post",
-    data: data
+    data: convert2FormData(data)
   });
 }
 
@@ -31,7 +31,7 @@ export function updateConfig(data) {
   return request({
     url: "/system/payment_config/",
     method: "put",
-    data: data
+    data: convert2FormData(data)
   });
 }
 
@@ -50,4 +50,16 @@ export function delConfig(id) {
     url: "/system/payment_config/" + id,
     method: "delete"
   });
+}
+
+export function convert2FormData(data) {
+  const formData = new FormData();
+  Object.keys(data).forEach(key => {
+    let val = data[key];
+    if (val == undefined || val == "undefined" || val == "") {
+    } else {
+      formData.append(key, data[key]);
+    }
+  });
+  return formData;
 }

@@ -78,6 +78,18 @@
       <el-table-column label="主键ID" align="center" prop="id" />
       <el-table-column label="应用APPID" align="center" prop="appId" />
       <el-table-column label="支付渠道" align="center" prop="channel" :formatter="channelFormat" />
+      <el-table-column
+        label="支付类型"
+        align="center"
+        prop="paymentType"
+        :formatter="paymentTypeFormat"
+      />
+      <el-table-column
+        label="支付子类型"
+        align="center"
+        prop="paymentSubType"
+        :formatter="paymentSubTypeFormat"
+      />
       <el-table-column label="应用描述" align="center" prop="appDesc" />
       <el-table-column label="应用密钥" align="center" prop="appSecret" />
       <el-table-column label="商户号" align="center" prop="mchId" />
@@ -131,7 +143,15 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="支付渠道">
+            <el-form-item label="secret" prop="appSecret">
+              <el-input v-model="form.appSecret" placeholder="请输入应用加密key" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="支付渠道" prop="channel">
               <el-select v-model="form.channel" placeholder="请选择支付渠道">
                 <el-option
                   v-for="dict in channelOptions"
@@ -142,19 +162,48 @@
               </el-select>
             </el-form-item>
           </el-col>
-        </el-row>
-        <el-row>
           <el-col :span="12">
             <el-form-item label="应用描述" prop="appDesc">
               <el-input v-model="form.appDesc" placeholder="请输入应用描述" />
             </el-form-item>
           </el-col>
+        </el-row>
+
+        <el-row>
           <el-col :span="12">
-            <el-form-item label="secret" prop="appSecret">
-              <el-input v-model="form.appSecret" placeholder="请输入应用加密key" />
+            <el-form-item label="支付类型" prop="paymentType">
+              <el-select v-model="form.paymentType" placeholder="请选择支付类型">
+                <el-option
+                  v-for="dict in paymentTypeOptions"
+                  :key="dict.dictValue"
+                  :label="dict.dictLabel"
+                  :value="dict.dictValue"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="子类型" prop="paymentSubType">
+              <el-select v-model="form.paymentSubType" placeholder="请选择支付子类型">
+                <el-option
+                  v-for="dict in paymentSubTypeOptions"
+                  :key="dict.dictValue"
+                  :label="dict.dictLabel"
+                  :value="dict.dictValue"
+                ></el-option>
+              </el-select>
             </el-form-item>
           </el-col>
         </el-row>
+
+        <el-row>
+          <el-col :span="24">
+            <el-form-item label="安全域名" prop="secDomain">
+              <el-input v-model="form.secDomain" placeholder="安全域名" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
         <el-row>
           <el-col :span="12">
             <el-form-item label="mchId" prop="mchId">
@@ -169,13 +218,47 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="公钥" prop="pubKey">
+
+        <el-row>
+          <el-form-item label="证书类型">
+            <el-radio-group v-model="certType" @change="certTypeChange">
+              <el-radio label="0">公钥/私钥</el-radio>
+              <el-radio label="1">pkcs格式</el-radio>
+            </el-radio-group>
+          </el-form-item>
+        </el-row>
+
+        <el-form-item label="公钥" prop="pubKey" v-show="pubPrivKeyShow">
           <el-input type="textarea" :rows="3" v-model="form.pubKey" placeholder="请输入公钥" />
         </el-form-item>
-        <el-form-item label="私钥" prop="privKey">
+        <el-form-item label="私钥" prop="privKey" v-show="pubPrivKeyShow">
           <el-input type="textarea" :rows="3" v-model="form.privKey" placeholder="请输入私钥" />
         </el-form-item>
+
+        <el-row v-show="!pubPrivKeyShow">
+          <el-col :span="12">
+            <el-form-item label="证书文件" prop="pkcsContent">
+              <el-upload
+                action="#"
+                :multiple="false"
+                :show-file-list="true"
+                :http-request="uploadHttpRequest"
+                :file-list="fileList"
+                :on-change="handleUploadChange"
+                :before-upload="beforeUpload"
+              >
+                <el-button type="primary">上传证书</el-button>
+              </el-upload>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="pkcsPwd" prop="pkcsPwd">
+              <el-input v-model="form.pkcsPwd" placeholder="证书密码" />
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
+
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
@@ -191,7 +274,7 @@ import { listConfig, getConfig, delConfig, addConfig, updateConfig, changeStatus
 import DetailDialog from '@/components/DetailDialog'
 export default {
   name: "Config",
-  components:{
+  components: {
     DetailDialog
   },
   data() {
@@ -212,10 +295,18 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      // 证书类型
+      certType: "0",
+      // 公钥/私钥显示
+      pubPrivKeyShow: true,
       // 支付渠道字典
       channelOptions: [],
       // 状态字典
       statusOptions: [],
+      // 支付类型字典
+      paymentTypeOptions: [],
+      // 支付子类型字典
+      paymentSubTypeOptions: [],
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -226,11 +317,17 @@ export default {
         status: undefined,
       },
       // 表单参数
-      form: {},
+      form: {
+
+      },
+      fileList: [],
       // 表单校验
       rules: {
         appId: [
           { required: true, message: "应用APPID不能为空", trigger: "blur" }
+        ],
+        appSecret: [
+          { required: true, message: "应用加密key不能为空", trigger: "blur" }
         ],
         channel: [
           { required: true, message: "支付渠道不能为空", trigger: "blur" }
@@ -238,8 +335,11 @@ export default {
         appDesc: [
           { required: true, message: "应用描述不能为空", trigger: "blur" }
         ],
-        appSecret: [
-          { required: true, message: "应用加密key不能为空", trigger: "blur" }
+        paymentType: [
+          { required: true, message: "支付类型不能为空", trigger: "blur" }
+        ],
+        paymentSubType: [
+          { required: true, message: "支付子类型不能为空", trigger: "blur" }
         ],
         status: [
           { required: true, message: "状态不能为空", trigger: "blur" }
@@ -264,6 +364,12 @@ export default {
     this.getDicts("sys_common_status").then(response => {
       this.statusOptions = response.data;
     });
+    this.getDicts("sys_payment_type").then(response => {
+      this.paymentTypeOptions = response.data;
+    });
+    this.getDicts("sys_payment_sub_type").then(response => {
+      this.paymentSubTypeOptions = response.data;
+    });
   },
   methods: {
     /** 查询支付配置列表 */
@@ -283,6 +389,23 @@ export default {
     statusFormat(row, column) {
       return this.selectDictLabel(this.statusOptions, row.status);
     },
+    paymentTypeFormat(row, column) {
+      return this.selectDictLabel(this.paymentTypeOptions, row.paymentType);
+    },
+    paymentSubTypeFormat(row, column) {
+      return this.selectDictLabel(this.paymentSubTypeOptions, row.paymentSubType);
+    },
+    certTypeChange(val) {
+      if (val == '0') {
+        this.pubPrivKeyShow = true;
+        this.form.pkcs = [];
+        this.form.pkcsPwd = undefined;
+      } else {
+        this.pubPrivKeyShow = false;
+        this.form.pubKey = undefined;
+        this.form.privKey = undefined;
+      }
+    },
     // 取消按钮
     cancel() {
       this.open = false;
@@ -294,14 +417,17 @@ export default {
         id: undefined,
         appId: undefined,
         channel: undefined,
+        paymentType: undefined,
         appDesc: undefined,
         appSecret: undefined,
         mchId: undefined,
         status: undefined,
+        certType: "0",
+        secDomain:undefined,
         pubKey: undefined,
         privKey: undefined,
-        createTime: undefined,
-        updateTime: undefined
+        pkcs: [],
+        pkcsPwd: undefined,
       };
       this.resetForm("form");
     },
@@ -342,20 +468,25 @@ export default {
     submitForm: function () {
       this.$refs["form"].validate(valid => {
         if (valid) {
+          this.form.certType = this.certType;
           if (this.form.id != undefined) {
             updateConfig(this.form).then(response => {
-              if (response.code === 200) {
+              if (response.code === 200 && response.data) {
                 this.msgSuccess("修改成功");
                 this.open = false;
                 this.getList();
+              } else {
+                this.msgSuccess(response.msg);
               }
             });
           } else {
             addConfig(this.form).then(response => {
-              if (response.code === 200) {
+              if (response.code === 200 && response.data) {
                 this.msgSuccess("新增成功");
                 this.open = false;
                 this.getList();
+              } else {
+                this.msgSuccess(response.msg);
               }
             });
           }
@@ -384,7 +515,7 @@ export default {
         cancelButtonText: "取消",
         type: "warning",
       }).then(function () {
-        return changeStatus({'id':row.id, 'status':row.status});
+        return changeStatus({ 'id': row.id, 'status': row.status });
       }).then(() => {
         this.msgSuccess(text + "成功");
         this.getList();
@@ -401,7 +532,7 @@ export default {
     handleCellDbClick(row, column, cell, event) {
       //8 9列的数据较长,弹出对话框显示
       const index = column.index;
-      console.log('index:'+index);
+      console.log('index:' + index);
       if (index === 8 || index === 9) {
         let msg = cell.innerText;
         try {
@@ -410,6 +541,31 @@ export default {
           msg = { 'msg': msg };
         }
         this.$refs.detailDialog.openDialog(msg);
+      }
+    },
+
+    beforeUpload(file) {
+      const fileType = file.name.substring(file.name.lastIndexOf('.'))
+      if (fileType.toLowerCase() != '.p12') {
+        this.$message.error('文件必须为.p12类型');
+        this.fileList = [];
+        return false;
+      }
+    },
+    // 覆盖element的默认上传文件
+    uploadHttpRequest(data) {
+      let reader = new FileReader();
+      let that = this;
+      that.form.pkcs = data.file;
+      // reader.readAsText(data.file);
+      // reader.onload = function () {
+      //   that.form.pkcs = this.result;
+      // }
+    },
+    // 限制文件上传的个数只有一个，获取上传列表的最后一个
+    handleUploadChange(file, fileList) {
+      if (fileList.length > 0) {
+        this.fileList = [fileList[fileList.length - 1]] // 这一步，是 展示最后一次选择的文件
       }
     }
   }
