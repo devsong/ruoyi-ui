@@ -165,8 +165,8 @@
           :key="key"
         >
         <div>
-          <button class="copy-text" 
-            v-clipboard:copy="value"  
+          <button class="copy-text"
+            v-clipboard:copy="value"
             v-clipboard:success="onCopySuccess"
             v-clipboard:error="onCopyError"
           >
@@ -220,7 +220,7 @@ export default {
         open: false,
         title: "代码预览",
         data: {},
-        activeName: "domain.java"
+        activeName: "entity.java"
       }
     };
   },

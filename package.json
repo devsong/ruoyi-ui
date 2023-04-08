@@ -1,8 +1,8 @@
 {
-	"name": "ruoyi",
+	"name": "backend",
 	"version": "3.0.0",
-	"description": "若依管理系统",
-	"author": "若依",
+	"description": "后台管理系统",
+	"author": "zhisong",
 	"license": "MIT",
 	"scripts": {
 		"dev": "vue-cli-service serve --open",
@@ -37,7 +37,7 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "https://gitee.com/y_project/RuoYi-Vue.git"
+		"url": "https://gitee.com/guanzhisong/ruoyi-ui.git"
 	},
 	"dependencies": {
 		"@riophae/vue-treeselect": "0.4.0",

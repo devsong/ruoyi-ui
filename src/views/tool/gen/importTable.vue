@@ -12,7 +12,7 @@
           />
         </el-select>
       </el-form-item>
-      
+
       <el-form-item label="数据库" prop="tableSchema">
         <el-select filterable v-model="queryParams.tableSchema" placeholder="请选择">
           <el-option
@@ -111,6 +111,7 @@ export default {
   methods: {
     // 显示弹框
     show() {
+      this.getJdbcUrl();
       this.getList();
       this.visible = true;
     },
