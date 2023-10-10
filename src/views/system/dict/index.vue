@@ -305,7 +305,7 @@ export default {
         if (valid) {
           if (this.form.dictId != undefined) {
             updateType(this.form).then(response => {
-              if (response.code === 200) {
+              if (response.code === 0) {
                 this.msgSuccess('修改成功');
                 this.open = false;
                 this.getList();
@@ -313,7 +313,7 @@ export default {
             });
           } else {
             addType(this.form).then(response => {
-              if (response.code === 200) {
+              if (response.code === 0) {
                 this.msgSuccess('新增成功');
                 this.open = false;
                 this.getList();
@@ -353,7 +353,7 @@ export default {
     /** 清理缓存按钮操作 */
     handleClearCache() {
       clearCache().then(response => {
-        if (response.code === 200) {
+        if (response.code === 0) {
           this.msgSuccess('清理成功');
         }
       });

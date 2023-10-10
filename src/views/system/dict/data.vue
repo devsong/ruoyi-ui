@@ -301,7 +301,7 @@ export default {
         if (valid) {
           if (this.form.dictCode != undefined) {
             updateData(this.form).then(response => {
-              if (response.code === 200) {
+              if (response.code === 0) {
                 this.msgSuccess('修改成功');
                 this.open = false;
                 this.getList();
@@ -309,7 +309,7 @@ export default {
             });
           } else {
             addData(this.form).then(response => {
-              if (response.code === 200) {
+              if (response.code === 0) {
                 this.msgSuccess('新增成功');
                 this.open = false;
                 this.getList();

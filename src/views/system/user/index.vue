@@ -340,12 +340,12 @@
 import { listUser, getUser, delUser, addUser, updateUser, exportUser, resetUserPwd, changeUserStatus, importTemplate } from '@/api/system/user';
 import { getToken } from '@/utils/auth';
 import { treeselect } from '@/api/system/dept';
-import Treeselect from '@riophae/vue-treeselect';
+import TreeSelect from '@riophae/vue-treeselect';
 import '@riophae/vue-treeselect/dist/vue-treeselect.css';
 
 export default {
   name: 'User',
-  components: { Treeselect },
+  components: { TreeSelect },
   data() {
     return {
       // 遮罩层
@@ -579,7 +579,7 @@ export default {
         cancelButtonText: '取消'
       }).then(({ value }) => {
         resetUserPwd(row.userId, value).then(response => {
-          if (response.code === 200) {
+          if (response.code === 0) {
             this.msgSuccess('修改成功，新密码是：' + value);
           }
         });
@@ -591,7 +591,7 @@ export default {
         if (valid) {
           if (this.form.userId !== undefined) {
             updateUser(this.form).then(response => {
-              if (response.code === 200) {
+              if (response.code === 0) {
                 this.msgSuccess('修改成功');
                 this.open = false;
                 this.getList();
@@ -599,7 +599,7 @@ export default {
             });
           } else {
             addUser(this.form).then(response => {
-              if (response.code === 200) {
+              if (response.code === 0) {
                 this.msgSuccess('新增成功');
                 this.open = false;
                 this.getList();

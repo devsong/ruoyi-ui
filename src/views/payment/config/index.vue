@@ -471,7 +471,7 @@ export default {
           this.form.certType = this.certType;
           if (this.form.id != undefined) {
             updateConfig(this.form).then(response => {
-              if (response.code === 200 && response.data) {
+              if (response.code === 0 && response.data) {
                 this.msgSuccess("修改成功");
                 this.open = false;
                 this.getList();
@@ -481,7 +481,7 @@ export default {
             });
           } else {
             addConfig(this.form).then(response => {
-              if (response.code === 200 && response.data) {
+              if (response.code === 0 && response.data) {
                 this.msgSuccess("新增成功");
                 this.open = false;
                 this.getList();

@@ -484,7 +484,7 @@ export default {
           if (this.form.roleId != undefined) {
             this.form.menuIds = this.getMenuAllCheckedKeys();
             updateRole(this.form).then(response => {
-              if (response.code === 200) {
+              if (response.code === 0) {
                 this.msgSuccess('修改成功');
                 this.open = false;
                 this.getList();
@@ -493,7 +493,7 @@ export default {
           } else {
             this.form.menuIds = this.getMenuAllCheckedKeys();
             addRole(this.form).then(response => {
-              if (response.code === 200) {
+              if (response.code === 0) {
                 this.msgSuccess('新增成功');
                 this.open = false;
                 this.getList();
@@ -508,7 +508,7 @@ export default {
       if (this.form.roleId != undefined) {
         this.form.deptIds = this.getDeptAllCheckedKeys();
         dataScope(this.form).then(response => {
-          if (response.code === 200) {
+          if (response.code === 0) {
             this.msgSuccess('修改成功');
             this.openDataScope = false;
             this.getList();
