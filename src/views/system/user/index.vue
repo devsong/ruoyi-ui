@@ -340,12 +340,12 @@
 import { listUser, getUser, delUser, addUser, updateUser, exportUser, resetUserPwd, changeUserStatus, importTemplate } from '@/api/system/user';
 import { getToken } from '@/utils/auth';
 import { treeselect } from '@/api/system/dept';
-import TreeSelect from '@riophae/vue-treeselect';
+import Treeselect from '@riophae/vue-treeselect';
 import '@riophae/vue-treeselect/dist/vue-treeselect.css';
 
 export default {
   name: 'User',
-  components: { TreeSelect },
+  components: { Treeselect },
   data() {
     return {
       // 遮罩层
